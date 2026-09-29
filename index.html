@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3S — People Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    <div class="bg-animated-overlay"></div>
+
+    <div class="container">
+      <nav class="brand-bar">
+        <div class="logo-box">
+          <svg class="logo-3s" viewBox="0 0 100 100" fill="none">
+            <polygon points="12,18 36,18 20,42" fill="#F26522" />
+            <path
+              d="M 38,18 H 82 A 18,18 0 0,1 100,36 A 18,18 0 0,1 82,54 H 50 A 18,18 0 0,0 32,72 A 18,18 0 0,0 50,90 H 94"
+              stroke="currentColor"
+              stroke-width="15"
+              stroke-linecap="square"
+              fill="none"
+            />
+          </svg>
+          <span class="brand-name">3S Management</span>
+        </div>
+
+        <div class="brand-nav-actions">
+          <button class="lang-btn" id="themeToggleBtn" onclick="toggleTheme()">
+            <svg
+              id="themeIcon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+            <span id="themeLabel">Light</span>
+          </button>
+
+          <button
+            class="lang-btn"
+            id="langToggleBtn"
+            onclick="toggleLanguage()"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path
+                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+              ></path>
+            </svg>
+            <span id="langLabel">العربية</span>
+          </button>
+        </div>
+      </nav>
+
+      <header class="page-header">
+        <div class="actions">
+          <button
+            class="btn btn-ghost"
+            onclick="showProductsRefresh()"
+            id="refreshBtn"
+          >
+            Refresh
+          </button>
+          <a class="btn btn-primary" href="newuser.html" id="addBtn">
+            + Add person
+          </a>
+        </div>
+      </header>
+
+      <div class="stats-container">
+        <div class="stat-card">
+          <span class="stat-label" id="statTotalLabel">Total People</span>
+          <span class="stat-value" id="statTotalVal">0</span>
+        </div>
+        <div class="stat-card male-stat">
+          <span class="stat-label" id="statMaleLabel">Males</span>
+          <span class="stat-value" id="statMaleVal">0</span>
+        </div>
+        <div class="stat-card female-stat">
+          <span class="stat-label" id="statFemaleLabel">Females</span>
+          <span class="stat-value" id="statFemaleVal">0</span>
+        </div>
+      </div>
+
+      <div class="search-bar-wrap">
+        <div class="search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle
+              cx="11"
+              cy="11"
+              r="7"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <path
+              d="M20 20l-3.5-3.5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <input type="text" id="searchInput" placeholder="Search..." />
+        </div>
+
+        <select
+          id="searchFieldSelect"
+          class="sort-btn"
+          onchange="handleSearchFieldChange(this.value)"
+        >
+          <option value="all" id="optSearchAll">All / الكل</option>
+          <option value="name" id="optSearchName">Name / الاسم</option>
+          <option value="phone" id="optSearchPhone">Phone / الهاتف</option>
+          <option value="age" id="optSearchAge">Age / العمر</option>
+          <option value="date" id="optSearchDate">Date / الميلاد</option>
+          <option value="email" id="optSearchEmail">Email / الإيميل</option>
+        </select>
+
+        <select
+          id="sortSelect"
+          class="sort-btn"
+          onchange="handleSortChange(this.value)"
+        >
+          <option value="none" id="optSortDefault">Sort By / ترتيب حسب</option>
+          <option value="name-asc" id="optSortNameAsc">Name (A-Z / أ-ي)</option>
+          <option value="name-desc" id="optSortNameDesc">
+            Name (Z-A / ي-أ)
+          </option>
+          <option value="age-asc" id="optSortAgeAsc">
+            Age (Youngest First / الأصغر أولاً)
+          </option>
+          <option value="age-desc" id="optSortAgeDesc">
+            Age (Oldest First / الأكبر أولاً)
+          </option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th
+                  id="thName"
+                  onclick="toggleSortField('name')"
+                  style="cursor: pointer"
+                >
+                  Name ↕
+                </th>
+                <th id="thGender">Gender</th>
+                <th id="thPhone">Phone</th>
+                <th id="thEmail">Email</th>
+                <th id="thBirth">Birth date</th>
+                <th
+                  id="thAge"
+                  onclick="toggleSortField('age')"
+                  style="cursor: pointer"
+                >
+                  Age ↕
+                </th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <span class="count" id="rangeLabel"></span>
+          <nav aria-label="Page navigation">
+            <ul class="pagination" id="pagination"></ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="userModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="modalTitle">Edit Person</h3>
+          <button class="close-btn" onclick="closeModal()">✕</button>
+        </div>
+        <form id="userForm" onsubmit="handleFormSubmit(event)">
+          <input type="hidden" id="editIndex" value="-1" />
+
+          <div class="form-group">
+            <label id="lblFormName">Name</label>
+            <input type="text" id="inputName" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label id="lblFormGender">Gender</label>
+              <select id="inputGender">
+                <option value="male">Male / ذكر</option>
+                <option value="female">Female / أنثى</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label id="lblFormPhone">Phone</label>
+              <input type="text" id="inputPhone" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label id="lblFormEmail">Email</label>
+            <input type="email" id="inputEmail" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label id="lblFormDate">Birth Date</label>
+              <input
+                type="date"
+                id="inputDate"
+                required
+                onchange="calculateAge()"
+              />
+            </div>
+            <div class="form-group">
+              <label id="lblFormAge">Age</label>
+              <input type="number" id="inputAge" readonly />
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn btn-ghost-dark"
+              onclick="closeModal()"
+              id="cancelBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-orange" id="saveBtn">
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="./index.js"></script>
+  </body>
+</html>
