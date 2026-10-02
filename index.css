@@ -455,6 +455,14 @@ html[dir="rtl"] tbody tr:hover {
   color: var(--tag-female-text);
 }
 
+.table-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--card-border);
+}
+
 .icon-btn {
   background: none;
   border: none;

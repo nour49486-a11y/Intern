@@ -159,6 +159,7 @@
             <thead>
               <tr>
                 <th>#</th>
+                <th id="thPhoto">Photo</th>
                 <th
                   id="thName"
                   onclick="toggleSortField('name')"
@@ -201,6 +202,62 @@
         </div>
         <form id="userForm" onsubmit="handleFormSubmit(event)">
           <input type="hidden" id="editIndex" value="-1" />
+
+          <!-- تعديل إضافة الصورة (رفع أو كاميرا) -->
+          <div
+            class="form-group"
+            style="align-items: center; text-align: center"
+          >
+            <label id="lblFormPhoto">Profile Picture</label>
+            <div
+              class="photo-container"
+              style="
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                justify-content: center;
+                margin-top: 5px;
+              "
+            >
+              <img
+                id="previewImg"
+                src=""
+                alt="Preview"
+                style="
+                  width: 50px;
+                  height: 50px;
+                  border-radius: 50%;
+                  object-fit: cover;
+                  border: 1px solid var(--card-border);
+                  display: none;
+                "
+              />
+              <input
+                type="file"
+                id="inputImageFile"
+                accept="image/*"
+                style="display: none"
+                onchange="handleImageUpload(event)"
+              />
+              <button
+                type="button"
+                class="btn btn-ghost"
+                onclick="document.getElementById('inputImageFile').click()"
+                id="uploadBtn"
+              >
+                Upload
+              </button>
+              <button
+                type="button"
+                class="btn btn-ghost"
+                onclick="openCameraModal()"
+                id="camBtn"
+              >
+                Camera
+              </button>
+            </div>
+            <input type="hidden" id="inputImageBase64" />
+          </div>
 
           <div class="form-group">
             <label id="lblFormName">Name</label>
@@ -256,6 +313,48 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- مودال التقاط الكاميرا -->
+    <div class="modal-overlay" id="cameraModal" style="z-index: 110">
+      <div class="modal-card" style="text-align: center">
+        <div class="modal-header">
+          <h3 id="camModalTitle">Take Photo</h3>
+          <button class="close-btn" onclick="closeCameraModal()">✕</button>
+        </div>
+        <div style="margin-bottom: 15px">
+          <video
+            id="webcamVideo"
+            autoplay
+            playsinline
+            style="
+              width: 100%;
+              max-height: 250px;
+              border-radius: var(--radius-md);
+              background: #000;
+            "
+          ></video>
+          <canvas id="webcamCanvas" style="display: none"></canvas>
+        </div>
+        <div class="modal-actions" style="justify-content: center">
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="captureWebcam()"
+            id="captureBtn"
+          >
+            Capture
+          </button>
+          <button
+            type="button"
+            class="btn btn-ghost-dark"
+            onclick="closeCameraModal()"
+            id="camCancelBtn"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
 

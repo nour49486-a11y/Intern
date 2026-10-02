@@ -17,6 +17,7 @@ const i18n = {
     optSearchAge: "Age",
     optSearchDate: "Birth Date",
     optSearchEmail: "Email",
+    thPhoto: "Photo",
     thName: "Name",
     thGender: "Gender",
     thPhone: "Phone",
@@ -30,6 +31,9 @@ const i18n = {
     showingOf: "of",
     addTitle: "Add Person",
     editTitle: "Edit Person",
+    lblFormPhoto: "Profile Picture",
+    uploadBtn: "Upload",
+    camBtn: "Camera",
     lblFormName: "Full Name",
     lblFormGender: "Gender",
     lblFormPhone: "Phone",
@@ -50,6 +54,8 @@ const i18n = {
     statTotalLabel: "Total People",
     statMaleLabel: "Males",
     statFemaleLabel: "Females",
+    camModalTitle: "Take Photo",
+    captureBtn: "Capture",
   },
   ar: {
     langLabel: "English",
@@ -69,6 +75,7 @@ const i18n = {
     optSearchAge: "العمر",
     optSearchDate: "تاريخ الميلاد",
     optSearchEmail: "الإيميل",
+    thPhoto: "الصورة",
     thName: "الاسم",
     thGender: "النوع",
     thPhone: "الهاتف",
@@ -82,6 +89,9 @@ const i18n = {
     showingOf: "من إجمالي",
     addTitle: "إضافة شخص جديد",
     editTitle: "تعديل البيانات",
+    lblFormPhoto: "الصورة الشخصية",
+    uploadBtn: "رفع صورة",
+    camBtn: "الكاميرا",
     lblFormName: "الاسم بالكامل",
     lblFormGender: "النوع",
     lblFormPhone: "رقم الهاتف",
@@ -102,11 +112,13 @@ const i18n = {
     statTotalLabel: "إجمالي الأشخاص",
     statMaleLabel: "الذكور",
     statFemaleLabel: "الإناث",
+    camModalTitle: "التقاط صورة",
+    captureBtn: "التقاط",
   },
 };
 
-let currentLang = localStorage.getItem("3s_lang") || "en";
-let currentTheme = localStorage.getItem("3s_theme") || "dark";
+let currentLang = localStorage.getItem("3s_lang") || "en";     // default بتاع اللغه وال الtheme
+let currentTheme = localStorage.getItem("3s_theme") || "dark";    //3s theme amd lang  for keys in theme
 
 let products = JSON.parse(localStorage.getItem("products")) || [
   {
@@ -116,6 +128,7 @@ let products = JSON.parse(localStorage.getItem("products")) || [
     email: "ahmed@example.com",
     date: "2004-09-26",
     age: 21,
+    image: "",
   },
   {
     name: "marwan mohamed",
@@ -124,6 +137,7 @@ let products = JSON.parse(localStorage.getItem("products")) || [
     email: "marwan@example.com",
     date: "2002-04-12",
     age: 23,
+    image: "",
   },
   {
     name: "سارة أحمد",
@@ -132,6 +146,7 @@ let products = JSON.parse(localStorage.getItem("products")) || [
     email: "sara@example.com",
     date: "2003-11-15",
     age: 22,
+    image: "",
   },
 ];
 
@@ -139,6 +154,7 @@ const saveProducts = () =>
   localStorage.setItem("products", JSON.stringify(products));
 
 if (!localStorage.getItem("products")) {
+  //مفيش لبانات في اللوكل استوردج بيسجل البيانات الحاليه باسم  بروداكتس
   saveProducts();
 }
 
@@ -146,7 +162,6 @@ const table = document.getElementById("tableBody");
 const pagination = document.getElementById("pagination");
 const searchInput = document.getElementById("searchInput");
 const searchFieldSelect = document.getElementById("searchFieldSelect");
-const countLabel = document.getElementById("countLabel");
 const rangeLabel = document.getElementById("rangeLabel");
 const sortSelect = document.getElementById("sortSelect");
 
@@ -155,16 +170,22 @@ let currentPage = 1;
 let searchText = "";
 let searchField = "all";
 let currentSort = "none";
+let webcamStream = null;
 
 function toggleTheme() {
-  currentTheme = currentTheme === "dark" ? "light" : "dark";
-  localStorage.setItem("3s_theme", currentTheme);
-  applyTheme();
+  /// بنبدل بين الواضعين
+  currentTheme = currentTheme === "dark" ? "light" : "dark"; // زي ال if  condation
+  localStorage.setItem("3s_theme", currentTheme);  /// بنحفظ في اللوكل اسنودج الوضع علي شان لما تيجي تحقظ تاني تلاقي اختيارك 
+  applyTheme(); 
+
 }
 
 function applyTheme() {
-  const t = i18n[currentLang];
+
+  const t = i18n[currentLang];  // دا ثابت بياخد اللغه الحاليه بس من ال i18n
+
   document.documentElement.setAttribute("data-theme", currentTheme);
+  /// بينفز في الصفحه doc --             -بتدي خصيصيه     ( اسم الخصيصيه و القيمه بتاعتها            )
 
   const themeLabel = document.getElementById("themeLabel");
   const themeIcon = document.getElementById("themeIcon");
@@ -175,7 +196,7 @@ function applyTheme() {
       themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
     } else {
       themeLabel.textContent = t.darkTheme;
-      themeIcon.innerHTML = `<path d="M12 3a6 6 0 0 0 9 9 9 0 1 1-9-9Z"></path>`;
+      themeIcon.innerHTML = `<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>`;
     }
   }
 }
@@ -259,6 +280,8 @@ function applyLanguage() {
   }
 
   updateTableHeaderIcons();
+  if (document.getElementById("thPhoto"))
+    document.getElementById("thPhoto").textContent = t.thPhoto;
   if (document.getElementById("thGender"))
     document.getElementById("thGender").textContent = t.thGender;
   if (document.getElementById("thPhone"))
@@ -268,6 +291,12 @@ function applyLanguage() {
   if (document.getElementById("thBirth"))
     document.getElementById("thBirth").textContent = t.thBirth;
 
+  if (document.getElementById("lblFormPhoto"))
+    document.getElementById("lblFormPhoto").textContent = t.lblFormPhoto;
+  if (document.getElementById("uploadBtn"))
+    document.getElementById("uploadBtn").textContent = t.uploadBtn;
+  if (document.getElementById("camBtn"))
+    document.getElementById("camBtn").textContent = t.camBtn;
   if (document.getElementById("lblFormName"))
     document.getElementById("lblFormName").textContent = t.lblFormName;
   if (document.getElementById("lblFormGender"))
@@ -284,6 +313,13 @@ function applyLanguage() {
     document.getElementById("cancelBtn").textContent = t.cancel;
   if (document.getElementById("saveBtn"))
     document.getElementById("saveBtn").textContent = t.save;
+
+  if (document.getElementById("camModalTitle"))
+    document.getElementById("camModalTitle").textContent = t.camModalTitle;
+  if (document.getElementById("captureBtn"))
+    document.getElementById("captureBtn").textContent = t.captureBtn;
+  if (document.getElementById("camCancelBtn"))
+    document.getElementById("camCancelBtn").textContent = t.cancel;
 
   if (document.getElementById("optSortDefault")) {
     document.getElementById("optSortDefault").textContent = t.optSortDefault;
@@ -404,22 +440,25 @@ function showProducts() {
   const start = (currentPage - 1) * perPage;
   const pageItems = processed.slice(start, start + perPage);
 
-  if (countLabel) countLabel.textContent = `${products.length} ${t.records}`;
-
   updateStats();
 
   if (!table) return;
 
   if (pageItems.length === 0) {
-    table.innerHTML = `<tr><td colspan="9"><div class="empty" style="text-align: center; padding: 20px; color: var(--text-muted);">${t.noMatches} "${searchText}"</div></td></tr>`;
+    table.innerHTML = `<tr><td colspan="10"><div class="empty" style="text-align: center; padding: 20px; color: var(--text-muted);">${t.noMatches} "${searchText}"</div></td></tr>`;
   } else {
     table.innerHTML = pageItems
       .map((el) => {
         const index = products.indexOf(el);
         const tagLabel = el.gender === "male" ? t.maleTag : t.femaleTag;
+        const defaultAvatar =
+          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'></path><circle cx='12' cy='7' r='4'></circle></svg>";
+        const avatarSrc = el.image ? el.image : defaultAvatar;
+
         return `
         <tr>
           <td>${index + 1}</td>
+          <td><img src="${avatarSrc}" class="table-avatar" alt="Avatar" /></td>
           <td class="name-cell">${el.name}</td>
           <td><span class="tag tag-${el.gender}">${tagLabel}</span></td>
           <td>+20 ${el.phone}</td>
@@ -509,6 +548,60 @@ function closeModal() {
   if (modal) modal.classList.remove("active");
 }
 
+/* دوال معالجة الصور (رفع وكاميرا) */
+function handleImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (uploadEvent) {
+    const base64String = uploadEvent.target.result;
+    document.getElementById("inputImageBase64").value = base64String;
+    const preview = document.getElementById("previewImg");
+    preview.src = base64String;
+    preview.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+}
+
+async function openCameraModal() {
+  const camModal = document.getElementById("cameraModal");
+  if (camModal) camModal.classList.add("active");
+  const video = document.getElementById("webcamVideo");
+  try {
+    webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = webcamStream;
+  } catch (err) {
+    alert("Could not access webcam.");
+    closeCameraModal();
+  }
+}
+
+function closeCameraModal() {
+  const camModal = document.getElementById("cameraModal");
+  if (camModal) camModal.classList.remove("active");
+  if (webcamStream) {
+    webcamStream.getTracks().forEach((track) => track.stop());
+    webcamStream = null;
+  }
+}
+
+function captureWebcam() {
+  const video = document.getElementById("webcamVideo");
+  const canvas = document.getElementById("webcamCanvas");
+  canvas.width = video.videoWidth || 320;
+  canvas.height = video.videoHeight || 240;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const base64String = canvas.toDataURL("image/png");
+
+  document.getElementById("inputImageBase64").value = base64String;
+  const preview = document.getElementById("previewImg");
+  preview.src = base64String;
+  preview.style.display = "block";
+
+  closeCameraModal();
+}
+
 function calculateAge() {
   const dobVal = document.getElementById("inputDate").value;
   if (!dobVal) return;
@@ -537,6 +630,7 @@ function handleFormSubmit(e) {
     email: document.getElementById("inputEmail").value,
     date: document.getElementById("inputDate").value,
     age: parseInt(document.getElementById("inputAge").value) || 0,
+    image: document.getElementById("inputImageBase64").value || "",
   };
 
   if (editIdx >= 0) {

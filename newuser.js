@@ -1,3 +1,65 @@
+let webcamStream = null;
+
+// معالجة رفع الصورة من الجهاز وتحويلها لـ Base64
+function handleImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (uploadEvent) {
+    const base64String = uploadEvent.target.result;
+    document.getElementById("inputImageBase64").value = base64String;
+    const preview = document.getElementById("previewImg");
+    preview.src = base64String;
+    preview.style.display = "inline-block";
+  };
+  reader.readAsDataURL(file);
+}
+
+// فتح كاميرا اللابتوب
+async function openCameraModal() {
+  const modalElement = document.getElementById("cameraModal");
+  const modal = new bootstrap.Modal(modalElement);
+  modal.show();
+
+  const video = document.getElementById("webcamVideo");
+  try {
+    webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = webcamStream;
+  } catch (err) {
+    alert("Could not access webcam.");
+    modal.hide();
+  }
+}
+
+// إغلاق الكاميرا وإيقاف الـ Stream
+function closeCameraModal() {
+  if (webcamStream) {
+    webcamStream.getTracks().forEach((track) => track.stop());
+    webcamStream = null;
+  }
+}
+
+// التقاط الصورة من الكاميرا
+function captureWebcam() {
+  const video = document.getElementById("webcamVideo");
+  const canvas = document.getElementById("webcamCanvas");
+  canvas.width = video.videoWidth || 320;
+  canvas.height = video.videoHeight || 240;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const base64String = canvas.toDataURL("image/png");
+
+  document.getElementById("inputImageBase64").value = base64String;
+  const preview = document.getElementById("previewImg");
+  preview.src = base64String;
+  preview.style.display = "inline-block";
+
+  const modalElement = document.getElementById("cameraModal");
+  const modal = bootstrap.Modal.getInstance(modalElement);
+  modal.hide();
+  closeCameraModal();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const userForm = document.getElementById("userForm");
   const dateInput = document.getElementById("date");
@@ -26,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const email = document.getElementById("email").value.trim();
       const date = dateInput.value;
       const age = calculateAge(date);
+      const image = document.getElementById("inputImageBase64").value || "";
 
       let products = JSON.parse(localStorage.getItem("products")) || [];
 
@@ -36,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
         email,
         date,
         age,
+        image,
       };
 
       products.push(newPerson);
